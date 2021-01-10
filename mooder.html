@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Devan's Mood Tracker</title>
+
+<style>
+h3 {
+    margin: 40px;
+}
+
+#button-container {
+    display: flex;
+    flex-direction: row;
+    margin: 40px;
+}
+
+#history-container {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.history-item {
+    text-align: center;
+    padding: 20px;
+}
+
+.history-item span {
+    color: #808080;
+}
+
+#chart-container {
+    width: 100%;
+    height: 300px;
+}
+</style>
+</head>
+
+<body>
+    <h3>How are you feeling?</h3>
+    <div id="button-container">
+        {{#moods}}
+        <form method="POST" action="/{{.}}">
+            <input type="submit" value="{{.}}" />
+        </form>
+        {{/moods}}
+    </div>
+
+    <div id="history-container">
+        {{#moodData}}
+        <div class="history-item">
+            {{mood}}
+            <br/><br/>
+            <span>{{displayDate}}</span>
+        </div>
+        {{/moodData}}
+    </div>
+
+    <div id="chart-container">
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <script type="text/javascript" src="/lib/Chart.bundle.js"></script>
+    <script type="text/javascript">
+        document.getElementById('history-container').scrollLeft = 1000000;
+
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var scatterChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: 'Moods',
+                    data: [
+                        {{#moodData}}
+                        {
+                            x: new Date('{{date}}'),
+                            y: {{mood}},
+                        },
+                        {{/moodData}}
+                    ],
+                    fill: false,
+                }]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        type: 'time',
+                        time: {
+                            unit: 'day',
+                        },
+                        position: 'bottom',
+                    }]
+                },
+                maintainAspectRatio: false,
+            }
+        });
+    </script>
+</body>
+</html>
